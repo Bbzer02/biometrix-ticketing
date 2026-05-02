@@ -1,0 +1,2757 @@
+@import 'tailwindcss';
+
+/* Class-based dark mode (toggle in Settings) */
+@custom-variant dark (&&:where(.dark, .dark *));
+
+@source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../storage/framework/views/*.php';
+@source '../**/*.blade.php';
+@source '../**/*.js';
+
+@theme {
+  --font-sans: 'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+}
+
+@layer components {
+  .sidebar-tickets-status-dropdown details[open] .sidebar-status-arrow {
+    transform: rotate(90deg);
+  }
+  .swift-transition {
+    @apply transition-all duration-200;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+  .swift-transition-slow {
+    @apply transition-all duration-300;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Smooth transitions globally */
+@layer base {
+  html {
+    @apply scroll-smooth;
+  }
+  a, button {
+    @apply transition-colors duration-200;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* iOS-style glass (frosted blur + vibrancy) */
+@layer components {
+  .glass {
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(255, 255, 255, 0.72);
+    border-color: rgba(255, 255, 255, 0.25);
+  }
+  .glass-dark {
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    background: rgba(36, 39, 44, 0.78);
+    border-color: rgba(255, 255, 255, 0.08);
+  }
+  .glass-card {
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+    background: rgba(255, 255, 255, 0.85);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .dark .glass-card {
+    background: rgba(255, 255, 255, 0.92);
+    border-color: rgba(226, 232, 240, 0.5);
+  }
+
+  /* Dashboard chart cards: slow-mo entrance */
+  .dashboard-chart-card {
+    opacity: 0;
+    transform: translateY(12px);
+    animation: dashboard-chart-in 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+    position: relative;
+    isolation: isolate;
+  }
+  .dashboard-chart-card::before {
+    content: '';
+    position: absolute;
+    inset: -1px;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: -1;
+    border: 1px solid rgba(59, 130, 246, 0.28);
+    box-shadow:
+      0 0 0 1px rgba(59, 130, 246, 0.08),
+      0 0 18px rgba(59, 130, 246, 0.14);
+  }
+  .dashboard-chart-card:hover::before {
+    border-color: rgba(59, 130, 246, 0.42);
+    box-shadow:
+      0 0 0 1px rgba(59, 130, 246, 0.12),
+      0 0 24px rgba(59, 130, 246, 0.2);
+  }
+  .dashboard-chart-card-2 { animation-delay: 0.1s; }
+  .dashboard-chart-card-3 { animation-delay: 0.2s; }
+  @keyframes dashboard-chart-in {
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* Ticker value subtle pulse when visible */
+  #monthly-ticker-value {
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  .dashboard-chart-card-2:hover #monthly-ticker-value {
+    transform: scale(1.02);
+  }
+}
+
+/* Main content: very subtle transparency so gradient subtly shows (iOS glass) */
+#app-main-content {
+  background: rgba(255, 255, 255, 0.38);
+  color: inherit;
+}
+.dark #app-main-content {
+  background: rgba(10, 13, 22, 0.42);
+  color: #f1f5f9;
+}
+/* Page title and subtitle (Dashboard, Welcome back Admin, Settings, etc.) = white in dark mode */
+.dark #app-main-content .content-header h1,
+.dark #app-main-content .content-header h2,
+.dark #app-main-content .content-header p,
+.dark #app-main-content .content-header span { color: #f1f5f9 !important; }
+/* All content cards: dark background with blue border */
+.dark #app-main-content .rounded-2xl.bg-white,
+.dark #app-main-content .rounded-2xl.dark\:bg-slate-800 {
+  background-color: #0b1020 !important;
+  border-color: rgba(59,130,246,0.6) !important;
+  color: #ffffff !important;
+}
+.dark #app-main-content .rounded-2xl.dark\:bg-slate-800 .border-slate-700 {
+  border-color: rgba(59,130,246,0.45) !important;
+}
+.dark #app-main-content .rounded-2xl.dark\:bg-slate-800 h1,
+.dark #app-main-content .rounded-2xl.dark\:bg-slate-800 .text-slate-100 {
+  color: #93c5fd !important;
+}
+/* Page titles on list cards: white text in dark mode (overrides global .text-slate-900 → blue) */
+html.dark #app-main-content .rounded-2xl.border.border-slate-200 > div:first-child h1,
+html.dark #app-main-content .rounded-2xl.bg-white > div:first-child h1 {
+  color: #f8fafc !important;
+}
+/* Inner card header row still uses bg-white in markup — match dark card (fixes white bar + invisible title) */
+html.dark #app-main-content .rounded-2xl.bg-white > div.border-b.bg-white,
+html.dark #app-main-content .rounded-2xl.border.border-slate-200 > div.border-b.bg-white {
+  background-color: #0f172a !important;
+  border-color: rgba(51, 65, 85, 0.75) !important;
+}
+/* Same overrides for modals rendered outside #app-main-content via @push('modals') */
+.dark [aria-modal="true"] .label-ticket { color: #0f172a !important; }
+.dark [aria-modal="true"] .input-ticket { background-color: #ffffff !important; border-color: #cbd5e1 !important; color: #0f172a !important; }
+.dark [aria-modal="true"] .input-ticket::placeholder { color: #475569 !important; }
+.dark [aria-modal="true"] .input-ticket:focus { border-color: #3b82f6 !important; }
+.dark [aria-modal="true"] select.input-ticket option { color: #0f172a; background: #fff; }
+.dark [aria-modal="true"] .text-slate-500 { color: #475569 !important; }
+.dark [aria-modal="true"] .text-slate-900 { color: #0f172a !important; }
+.dark [aria-modal="true"] .bg-white { background-color: #ffffff !important; }
+.dark [aria-modal="true"] .bg-white\/95 { background-color: rgba(255,255,255,0.95) !important; }
+.dark [aria-modal="true"] .border-slate-200 { border-color: #e2e8f0 !important; }
+.dark [aria-modal="true"] .text-slate-700 { color: #334155 !important; }
+.dark [aria-modal="true"] .text-slate-600 { color: #475569 !important; }
+/* DataTables: keep controls readable */
+#app-main-content .dataTables_wrapper label,
+#app-main-content .dataTables_wrapper input,
+#app-main-content .dataTables_wrapper select,
+#app-main-content .dt-container label,
+#app-main-content .dt-container input,
+#app-main-content .dt-container select {
+  color: #0f172a !important;
+  background-color: #ffffff !important;
+  border-color: #cbd5e1 !important;
+}
+#app-main-content .dataTables_wrapper input::placeholder,
+#app-main-content .dt-container input::placeholder { color: #64748b !important; }
+/* Dashboard chart cards: dark theme with blue border (status card uses its own glass/gradient markup) */
+html.dark .dashboard-chart-card:not(.dashboard-status-card) {
+  background: rgba(255,255,255,0.05) !important;
+  border-color: rgba(59,130,246,0.4) !important;
+}
+html.dark .dashboard-chart-card-2,
+html.dark .dashboard-chart-card-3 {
+  background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04) 45%, rgba(30,58,138,0.22)) !important;
+  border-color: rgba(96, 165, 250, 0.45) !important;
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.12),
+    0 20px 50px -24px rgba(59, 130, 246, 0.35) !important;
+}
+html.dark .dashboard-status-card {
+  background: linear-gradient(135deg, rgba(255,255,255,0.09), rgba(255,255,255,0.04) 45%, rgba(30,58,138,0.22)) !important;
+  border-color: rgba(96, 165, 250, 0.45) !important;
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.12),
+    0 20px 50px -24px rgba(59, 130, 246, 0.35) !important;
+}
+html.dark .dashboard-chart-card::before {
+  border-color: rgba(59, 130, 246, 0.5);
+  box-shadow:
+    0 0 0 1px rgba(59, 130, 246, 0.18),
+    0 0 24px rgba(59, 130, 246, 0.34),
+    0 0 44px rgba(37, 99, 235, 0.2);
+}
+html.dark .dashboard-chart-card:hover::before {
+  border-color: rgba(96, 165, 250, 0.7);
+  box-shadow:
+    0 0 0 1px rgba(96, 165, 250, 0.22),
+    0 0 30px rgba(59, 130, 246, 0.45),
+    0 0 56px rgba(37, 99, 235, 0.3);
+}
+html.dark .dashboard-chart-card:not(.dashboard-status-card) h2,
+html.dark .dashboard-chart-card:not(.dashboard-status-card) p,
+html.dark .dashboard-chart-card:not(.dashboard-status-card) span { color: #93c5fd !important; }
+
+/* Status rings: glow is on stroke via SVG filter (#status-ring-glow); avoid CSS drop-shadow (oval halo) */
+.status-multi-ring canvas {
+  filter: none !important;
+}
+.status-multi-ring {
+  position: relative;
+}
+.status-multi-ring::before {
+  content: "";
+  position: absolute;
+  inset: 10% 8%;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgba(59, 130, 246, 0.16) 0%, rgba(59, 130, 246, 0.08) 36%, transparent 72%);
+  filter: blur(18px);
+  pointer-events: none;
+  z-index: 0;
+}
+.status-multi-ring .status-ring-svg {
+  filter: none;
+  position: relative;
+  z-index: 1;
+}
+html.dark .status-multi-ring::before {
+  background: radial-gradient(circle, rgba(96, 165, 250, 0.24) 0%, rgba(59, 130, 246, 0.14) 38%, transparent 74%);
+}
+.status-multi-ring .status-pct-label {
+  opacity: 0;
+  transition: opacity 0.18s ease-in-out;
+}
+.status-multi-ring:hover .status-pct-label,
+.status-multi-ring:focus-within .status-pct-label {
+  opacity: 1;
+}
+
+/* Status card: titles/legend (override global html.dark .text-slate-* tints) */
+html.dark .dashboard-status-card h2 {
+  color: rgba(219, 234, 254, 0.95) !important;
+}
+html.dark .dashboard-status-card .status-card-pill {
+  color: rgba(191, 219, 254, 0.88) !important;
+}
+html.dark .dashboard-status-card .status-legend,
+html.dark .dashboard-status-card .status-legend > span {
+  color: rgba(226, 232, 240, 0.9) !important;
+}
+html.dark .dashboard-status-card > p {
+  color: rgba(147, 197, 253, 0.78) !important;
+}
+html.dark #monthly-ticker {
+  background: rgba(255,255,255,0.05) !important;
+  border-color: rgba(59,130,246,0.4) !important;
+}
+html.dark #monthly-ticker-value { color: #ffffff !important; }
+html.dark #monthly-ticker .text-slate-500 { color: rgba(147,197,253,0.6) !important; }
+
+/* DataTables: dark mode — slate toolbar, high-contrast controls (not light-blue on pure black) */
+html.dark #app-main-content .dataTables_wrapper,
+html.dark #app-main-content .dt-container {
+  color: #e2e8f0 !important;
+}
+html.dark #app-main-content .dataTables_wrapper label,
+html.dark #app-main-content .dt-container label {
+  color: #cbd5e1 !important;
+  background: transparent !important;
+}
+html.dark #app-main-content .dataTables_wrapper input,
+html.dark #app-main-content .dataTables_wrapper select,
+html.dark #app-main-content .dt-container input,
+html.dark #app-main-content .dt-container select {
+  color: #f8fafc !important;
+  background-color: #0f172a !important;
+  border-color: rgba(148, 163, 184, 0.35) !important;
+}
+html.dark #app-main-content .dataTables_wrapper input::placeholder,
+html.dark #app-main-content .dt-container input::placeholder { color: rgba(148, 163, 184, 0.65) !important; }
+/* DataTables 2: toolbar rows (everything except the table row) get a slate strip */
+html.dark #app-main-content .dt-container > .dt-layout-row:not(.dt-layout-table) {
+  background-color: #1e293b !important;
+  padding: 0.625rem 0.875rem !important;
+  border-radius: 0.5rem;
+  margin-bottom: 0.5rem !important;
+  border: 1px solid rgba(148, 163, 184, 0.22);
+  align-items: center;
+}
+
+/* Table â€” dark background, blue border, white text */
+html.dark #app-main-content table.dataTable,
+html.dark #app-main-content table.display {
+  background-color: #0b1020 !important;
+  color: #ffffff !important;
+  border-color: rgba(59,130,246,0.4) !important;
+}
+html.dark #app-main-content table.dataTable thead th,
+html.dark #app-main-content table.display thead th {
+  background-color: rgba(255,255,255,0.05) !important;
+  color: #93c5fd !important;
+  border-bottom-color: rgba(59,130,246,0.3) !important;
+}
+html.dark #app-main-content table.dataTable tbody tr,
+html.dark #app-main-content table.display tbody tr {
+  background-color: #0b1020 !important;
+  color: #ffffff !important;
+  border-bottom-color: rgba(59,130,246,0.15) !important;
+}
+html.dark #app-main-content table.dataTable tbody tr:hover,
+html.dark #app-main-content table.display tbody tr:hover {
+  background-color: rgba(59,130,246,0.08) !important;
+}
+html.dark #app-main-content table.dataTable tbody tr.odd,
+html.dark #app-main-content table.display tbody tr.odd {
+  background-color: rgba(255,255,255,0.02) !important;
+}
+html.dark #app-main-content table.dataTable tbody tr.even,
+html.dark #app-main-content table.display tbody tr.even {
+  background-color: #0b1020 !important;
+}
+html.dark #app-main-content table.dataTable tbody td,
+html.dark #app-main-content table.display tbody td {
+  color: #f8fafc !important;
+  border-bottom-color: rgba(59,130,246,0.15) !important;
+}
+/* Beat global .text-slate-* on cells and links (DataTables may clone nodes; class order varies) */
+html.dark #app-main-content table.dataTable tbody td.text-slate-900,
+html.dark #app-main-content table.dataTable tbody td.text-slate-600,
+html.dark #app-main-content table.display tbody td.text-slate-900,
+html.dark #app-main-content table.display tbody td.text-slate-600,
+html.dark #app-main-content table.dataTable tbody td .text-slate-900,
+html.dark #app-main-content table.dataTable tbody td .text-slate-600,
+html.dark #app-main-content table.display tbody td .text-slate-900,
+html.dark #app-main-content table.display tbody td .text-slate-600 {
+  color: #f8fafc !important;
+}
+/* Slate “chip” badges + icon buttons: light gray → dark slate */
+html.dark #app-main-content table.dataTable tbody .bg-slate-100,
+html.dark #app-main-content table.display tbody .bg-slate-100 {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.25) !important;
+}
+html.dark #app-main-content table.dataTable tbody button.bg-slate-100,
+html.dark #app-main-content table.display tbody button.bg-slate-100 {
+  background-color: #1e293b !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.3) !important;
+}
+html.dark #app-main-content table.dataTable tbody button.bg-slate-100:hover,
+html.dark #app-main-content table.display tbody button.bg-slate-100:hover {
+  background-color: #334155 !important;
+  color: #f8fafc !important;
+}
+/* Online badge: readable on dark rows */
+html.dark #app-main-content table.dataTable tbody .bg-emerald-100,
+html.dark #app-main-content table.display tbody .bg-emerald-100 {
+  background-color: rgba(6, 78, 59, 0.55) !important;
+  color: #a7f3d0 !important;
+  border: 1px solid rgba(52, 211, 153, 0.35) !important;
+}
+/* Delete icon cell: soften light red box */
+html.dark #app-main-content table.dataTable tbody button.bg-red-50,
+html.dark #app-main-content table.display tbody button.bg-red-50 {
+  background-color: rgba(127, 29, 29, 0.45) !important;
+  color: #fecaca !important;
+  border: 1px solid rgba(248, 113, 113, 0.35) !important;
+}
+html.dark #app-main-content table.dataTable tbody button.bg-red-50:hover,
+html.dark #app-main-content table.display tbody button.bg-red-50:hover {
+  background-color: rgba(153, 27, 27, 0.55) !important;
+}
+/* Pagination — same chip language as ticket action icons */
+html.dark #app-main-content .dataTables_paginate .paginate_button,
+html.dark #app-main-content .dt-paging button {
+  color: #bfdbfe !important;
+  background: rgba(37, 99, 235, 0.22) !important;
+  border: 1px solid rgba(59, 130, 246, 0.45) !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.2) !important;
+  border-radius: 9999px !important;
+}
+/* Footer sizing: info + pagination controls */
+#app-main-content .dataTables_info,
+#app-main-content .dt-info {
+  font-size: 0.9rem !important;
+  line-height: 1.35 !important;
+}
+#app-main-content .dataTables_paginate .paginate_button,
+#app-main-content .dt-paging button {
+  min-width: 2.15rem !important;
+  height: 2.15rem !important;
+  padding: 0 0.55rem !important;
+  border-radius: 0.45rem !important;
+  font-size: 0.85rem !important;
+}
+/* Top controls sizing: "Show entries" + Search */
+#app-main-content .dataTables_wrapper .dataTables_length label,
+#app-main-content .dataTables_wrapper .dataTables_filter label,
+#app-main-content .dt-container .dt-length label,
+#app-main-content .dt-container .dt-search label {
+  font-size: 0.9rem !important;
+}
+#app-main-content .dataTables_wrapper .dataTables_length select,
+#app-main-content .dataTables_wrapper .dataTables_filter input,
+#app-main-content .dt-container .dt-length select,
+#app-main-content .dt-container .dt-search input {
+  height: 2.15rem !important;
+  min-height: 2.15rem !important;
+  font-size: 0.9rem !important;
+  padding: 0.35rem 0.65rem !important;
+  border-radius: 0.45rem !important;
+}
+
+/* DataTable search input: light mode default */
+#tickets-table_wrapper .dataTables_filter input,
+#tickets-table_wrapper .dt-search input,
+#users-table_wrapper .dataTables_filter input,
+#users-table_wrapper .dt-search input,
+#audit-users-table_wrapper .dataTables_filter input,
+#audit-users-table_wrapper .dt-search input {
+  height: 2.35rem !important;
+  min-height: 2.35rem !important;
+  border-radius: 0.95rem !important;
+  border: 1px solid #cbd5e1 !important;
+  background: #ffffff !important;
+  color: #0f172a !important;
+  padding: 0.4rem 0.85rem !important;
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06) !important;
+}
+#tickets-table_wrapper .dataTables_filter input::placeholder,
+#tickets-table_wrapper .dt-search input::placeholder,
+#users-table_wrapper .dataTables_filter input::placeholder,
+#users-table_wrapper .dt-search input::placeholder,
+#audit-users-table_wrapper .dataTables_filter input::placeholder,
+#audit-users-table_wrapper .dt-search input::placeholder {
+  color: #94a3b8 !important;
+}
+#tickets-table_wrapper .dataTables_filter input:focus,
+#tickets-table_wrapper .dt-search input:focus,
+#users-table_wrapper .dataTables_filter input:focus,
+#users-table_wrapper .dt-search input:focus,
+#audit-users-table_wrapper .dataTables_filter input:focus,
+#audit-users-table_wrapper .dt-search input:focus {
+  border-color: #24b4fb !important;
+  box-shadow: 0 0 0 3px rgba(36, 180, 251, 0.24), 0 0 12px rgba(36, 180, 251, 0.18) !important;
+  outline: none !important;
+}
+/* DataTable search input: dark mode skin */
+html.dark #tickets-table_wrapper .dataTables_filter input,
+html.dark #tickets-table_wrapper .dt-search input,
+html.dark #users-table_wrapper .dataTables_filter input,
+html.dark #users-table_wrapper .dt-search input,
+html.dark #audit-users-table_wrapper .dataTables_filter input,
+html.dark #audit-users-table_wrapper .dt-search input {
+  border: 2px solid #24b4fb !important;
+  background: linear-gradient(180deg, #111a33 0%, #0b1020 100%) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 0 0 1px rgba(36, 180, 251, 0.12), inset 0 1px 0 rgba(255, 255, 255, 0.04) !important;
+}
+html.dark #tickets-table_wrapper .dataTables_filter input::placeholder,
+html.dark #tickets-table_wrapper .dt-search input::placeholder,
+html.dark #users-table_wrapper .dataTables_filter input::placeholder,
+html.dark #users-table_wrapper .dt-search input::placeholder,
+html.dark #audit-users-table_wrapper .dataTables_filter input::placeholder,
+html.dark #audit-users-table_wrapper .dt-search input::placeholder {
+  color: rgba(191, 219, 254, 0.7) !important;
+}
+html.dark #app-main-content .dataTables_paginate .paginate_button:hover,
+html.dark #app-main-content .dt-paging button:hover:not(.disabled):not(.current) {
+  background: rgba(37, 99, 235, 0.38) !important;
+  color: #ffffff !important;
+  border-color: rgba(96, 165, 250, 0.65) !important;
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.28) !important;
+}
+html.dark #app-main-content .dataTables_paginate .paginate_button.current,
+html.dark #app-main-content .dt-paging button.current {
+  background: rgba(37, 99, 235, 0.55) !important;
+  color: #f8fafc !important;
+  border-color: rgba(147, 197, 253, 0.75) !important;
+  box-shadow: 0 0 0 1px rgba(147, 197, 253, 0.25), 0 4px 16px rgba(37, 99, 235, 0.35) !important;
+}
+html.dark #app-main-content .dataTables_paginate .paginate_button.disabled,
+html.dark #app-main-content .dt-paging button.disabled {
+  color: rgba(147, 197, 253, 0.28) !important;
+  background: rgba(15, 23, 42, 0.35) !important;
+  border-color: rgba(51, 65, 85, 0.6) !important;
+  box-shadow: none !important;
+}
+/* Info text */
+html.dark #app-main-content .dataTables_info,
+html.dark #app-main-content .dt-info {
+  color: #94a3b8 !important;
+}
+/* Sorting arrows */
+html.dark #app-main-content table.dataTable thead .sorting::after,
+html.dark #app-main-content table.dataTable thead .sorting_asc::after,
+html.dark #app-main-content table.dataTable thead .sorting_desc::after {
+  color: rgba(147,197,253,0.5) !important;
+}
+
+.dark #app-main-content .recent-tickets-card { background-color: #0b1020 !important; border-color: rgba(59,130,246,0.4) !important; color: #ffffff !important; }
+.dark #app-main-content .recent-tickets-card .overflow-x-auto { background-color: #0b1020 !important; }
+.dark #app-main-content .recent-tickets-header { background-color: rgba(255,255,255,0.03) !important; border-color: rgba(59,130,246,0.2) !important; }
+.dark #app-main-content .recent-tickets-header[class*="bg-slate-50/80"] { background-color: rgba(255,255,255,0.03) !important; }
+.dark #app-main-content .recent-tickets-table { border-color: rgba(59,130,246,0.2) !important; }
+.dark #app-main-content .recent-tickets-table thead { background-color: rgba(255,255,255,0.05) !important; }
+.dark #app-main-content .recent-tickets-table thead.bg-slate-50 { background-color: rgba(255,255,255,0.05) !important; }
+.dark #app-main-content .recent-tickets-table thead tr { border-color: rgba(59,130,246,0.2) !important; }
+.dark #app-main-content .recent-tickets-table tbody { background-color: #0b1020 !important; }
+.dark #app-main-content .recent-tickets-table tbody.bg-white { background-color: #0b1020 !important; }
+.dark #app-main-content .recent-tickets-table tbody tr { border-color: #e2e8f0 !important; }
+.dark #app-main-content .recent-tickets-table tbody tr:hover { background-color: #f8fafc !important; }
+
+/* Row / list links that reuse ticket-* class names — not the circular table chips */
+html.dark #app-main-content .ticket-quick-view-btn:not(.ticket-actions-radial-item),
+html.dark #app-main-content .ticket-edit-modal-btn:not(.ticket-actions-radial-item),
+html.dark #app-main-content .index-delete-ticket-btn:not(.ticket-actions-radial-item),
+html.dark #app-main-content .ajax-accept-ticket-form button:not(.ticket-actions-radial-item),
+html.dark #app-main-content .ajax-close-ticket-form button:not(.ticket-actions-radial-item) {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+html.dark #app-main-content .ticket-quick-view-btn:not(.ticket-actions-radial-item) {
+  color: #60a5fa !important;
+}
+html.dark #app-main-content .ticket-quick-view-btn:not(.ticket-actions-radial-item):hover {
+  color: #93c5fd !important;
+}
+html.dark #app-main-content .ticket-edit-modal-btn:not(.ticket-actions-radial-item) {
+  color: #94a3b8 !important;
+}
+html.dark #app-main-content .ticket-edit-modal-btn:not(.ticket-actions-radial-item):hover {
+  color: #cbd5e1 !important;
+}
+html.dark #app-main-content .index-delete-ticket-btn:not(.ticket-actions-radial-item) {
+  color: #f87171 !important;
+}
+html.dark #app-main-content .index-delete-ticket-btn:not(.ticket-actions-radial-item):hover {
+  color: #fca5a5 !important;
+}
+html.dark #app-main-content .ajax-accept-ticket-form button:not(.ticket-actions-radial-item) {
+  color: #34d399 !important;
+}
+html.dark #app-main-content .ajax-accept-ticket-form button:not(.ticket-actions-radial-item):hover {
+  color: #6ee7b7 !important;
+}
+html.dark #app-main-content .ajax-close-ticket-form button:not(.ticket-actions-radial-item) {
+  color: #34d399 !important;
+}
+html.dark #app-main-content .ajax-close-ticket-form button:not(.ticket-actions-radial-item):hover {
+  color: #6ee7b7 !important;
+}
+/* Light mode: page shell (dark mode overrides below) */
+body.bg-glass-page {
+  background-color: #f7f5ff;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(180, 150, 255, 0.40) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 55% at 90% 15%, rgba(130, 195, 255, 0.38) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 85%, rgba(100, 220, 230, 0.30) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 45% at 20% 80%, rgba(210, 140, 255, 0.28) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 48%, rgba(190, 180, 255, 0.22) 0%, transparent 55%);
+  background-attachment: fixed;
+  color: #0f172a;
+}
+html.dark body.bg-glass-page {
+  background-color: #07080f;
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 10%, rgba(59, 36, 120, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 55% at 90% 15%, rgba(20, 70, 130, 0.50) 0%, transparent 55%),
+    radial-gradient(ellipse 60% 50% at 80% 85%, rgba(15, 90, 100, 0.40) 0%, transparent 55%),
+    radial-gradient(ellipse 65% 45% at 20% 80%, rgba(80, 20, 100, 0.35) 0%, transparent 55%),
+    radial-gradient(ellipse 40% 40% at 50% 48%, rgba(30, 30, 80, 0.30) 0%, transparent 55%);
+  background-attachment: fixed;
+  color: #e2e8f0;
+}
+
+/* Dark mode only: map Tailwind text-slate-* to blue-tinted UI (must not run in light mode) */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-slate-700 {
+  color: #93c5fd !important;
+}
+html.dark .text-slate-600,
+html.dark .text-slate-500 {
+  color: rgba(147, 197, 253, 0.6) !important;
+}
+html.dark .text-slate-400 {
+  color: rgba(147, 197, 253, 0.4) !important;
+}
+
+/* Pagination (Laravel default) */
+@layer components {
+  .pagination {
+    @apply flex flex-wrap gap-2 justify-center items-center mt-6;
+  }
+  .pagination a, .pagination span {
+    @apply inline-flex items-center justify-center min-w-[2.25rem] h-9 px-3 rounded-lg text-sm font-medium transition-colors duration-200;
+  }
+  .pagination a {
+    @apply bg-white border border-slate-200 text-slate-700 hover:bg-slate-50 hover:border-slate-300 dark:bg-slate-700 dark:border-slate-600 dark:text-slate-200 dark:hover:bg-slate-600;
+  }
+  .pagination span[aria-current="page"] {
+    @apply bg-slate-800 text-white border-slate-800 dark:bg-slate-500 dark:border-slate-500;
+  }
+  .pagination .disabled span {
+    @apply bg-slate-100 text-slate-400 border-slate-200 cursor-default dark:bg-slate-700 dark:text-slate-500 dark:border-slate-600;
+  }
+
+  /* Ticket status badges */
+  .badge-ticket {
+    @apply inline-flex items-center rounded-lg px-2.5 py-0.5 text-xs font-medium;
+  }
+  .badge-ticket.badge-open { @apply bg-blue-100 text-blue-800; }
+  .badge-ticket.badge-new { @apply bg-blue-100 text-blue-800; }
+  .badge-ticket.badge-in_progress { @apply bg-amber-100 text-amber-800; }
+  .badge-ticket.badge-waiting_on_user { @apply bg-indigo-100 text-indigo-800; }
+  .badge-ticket.badge-resolved { @apply bg-emerald-100 text-emerald-800; }
+  .badge-ticket.badge-closed { @apply bg-slate-100 text-slate-600; }
+  .badge-ticket.badge-cancelled { @apply bg-red-100 text-red-800; }
+
+  /* Tickets table: sticky first column when horizontally scrolling */
+  .tickets-table-wrap {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+  .tickets-table-wrap .sticky-col {
+    position: sticky;
+    left: 0;
+    z-index: 1;
+    background: inherit;
+    box-shadow: 2px 0 4px -2px rgba(0, 0, 0, 0.06);
+  }
+  .tickets-table-wrap thead .sticky-col {
+    background: #f8fafc;
+  }
+  .dark .tickets-table-wrap thead .sticky-col {
+    background: #f8fafc;
+  }
+  .tickets-table-wrap tbody tr .sticky-col {
+    background: #ffffff;
+  }
+  .tickets-table-wrap tbody tr:hover .sticky-col {
+    background: #f8fafc;
+  }
+  .dark .tickets-table-wrap tbody tr .sticky-col {
+    background: #ffffff;
+  }
+  .dark .tickets-table-wrap tbody tr:hover .sticky-col {
+    background: #f8fafc;
+  }
+
+  /* Form inputs: IT support style â€” dark text for visibility */
+  .input-ticket {
+    @apply mt-1 block w-full rounded-xl border border-slate-300 bg-white px-4 py-2.5 text-slate-900 shadow-sm transition-colors placeholder:text-slate-600 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 dark:border-slate-600 dark:bg-slate-700 dark:text-slate-100 dark:placeholder:text-slate-400 dark:focus:border-blue-400 dark:focus:ring-blue-400/30;
+  }
+  .input-ticket:disabled { @apply cursor-not-allowed bg-slate-50 text-slate-500 dark:bg-slate-800 dark:text-slate-400; }
+  .label-ticket {
+    @apply block text-sm font-medium text-slate-800 dark:text-slate-300;
+  }
+
+  /* Guest / login page inputs (structure; colors from view) */
+  .input-guest {
+    @apply mt-1.5 block w-full rounded-xl border px-4 py-2.5 text-base;
+  }
+  .input-guest:focus {
+    @apply outline-none ring-2 ring-offset-2;
+  }
+  .label-guest {
+    @apply block text-sm font-semibold;
+  }
+
+  /* Soft primary button (Uiverse-style) */
+  .btn-soft-wrap {
+    @apply inline-flex bg-gradient-to-b from-stone-300/40 to-transparent p-[4px] rounded-[16px];
+  }
+  .btn-soft {
+    @apply p-[4px] rounded-[12px] bg-gradient-to-b from-white to-stone-200/40 shadow-[0_1px_3px_rgba(0,0,0,0.5)] active:shadow-[0_0px_1px_rgba(0,0,0,0.5)] active:scale-[0.995];
+  }
+  .btn-soft-inner {
+    @apply bg-gradient-to-b from-stone-200/40 to-white/80 rounded-[8px] px-3 py-2 flex items-center gap-2 text-sm font-semibold text-slate-900;
+  }
+
+  /* Sidebar panel: two-panel container, no clipping so cards can float */
+  .sidebar-panel {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-start;
+    height: 100vh;
+    position: sticky;
+    top: 0;
+    background: transparent;
+    border-right: none;
+    overflow: visible;
+  }
+  /* Icon rail â€” always visible, narrow â€” floating rounded card */
+  .sidebar-rail {
+    width: 4.5rem;
+    min-width: 4.5rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: rgba(24, 34, 54, 0.94);
+    border: 1px solid rgba(148, 163, 184, 0.24);
+    border-radius: 1rem;
+    margin: 0.625rem 0 0.625rem 0.625rem;
+    box-shadow: 0 8px 28px rgba(2, 6, 23, 0.35), 0 2px 8px rgba(2, 6, 23, 0.25);
+    z-index: 2;
+    height: calc(100vh - 1.25rem);
+    flex-shrink: 0;
+    overflow: hidden;
+    align-self: flex-start;
+  }
+  /* Rail logo area */
+  .sidebar-rail-logo {
+    height: 3.25rem;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  }
+  /* Rail nav: each icon is exactly 3rem tall, no gap â€” pure flex column */
+  .sidebar-rail-nav {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 0.5rem 0;
+    overflow-y: auto;
+    width: 100%;
+  }
+  /* Label panel â€” floating card that slides out next to the rail */
+  .sidebar-label-panel {
+    display: flex;
+    flex-direction: column;
+    width: 11.5rem;
+    background: rgba(31, 41, 64, 0.94);
+    -webkit-backdrop-filter: blur(24px) saturate(180%);
+    backdrop-filter: blur(24px) saturate(180%);
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    border-radius: 1rem;
+    margin: 0.625rem 0 0.625rem 0.5rem;
+    box-shadow: 0 8px 28px rgba(2, 6, 23, 0.35), 0 2px 8px rgba(2, 6, 23, 0.25);
+    overflow: hidden;
+    transition: width 0.26s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.2s ease, margin 0.26s ease;
+    opacity: 1;
+    height: calc(100vh - 1.25rem);
+    align-self: flex-start;
+  }
+  .sidebar-panel.collapsed .sidebar-label-panel {
+    width: 0;
+    opacity: 0;
+    margin-left: 0;
+    pointer-events: none;
+  }
+  /* Label panel spacer â€” must match .sidebar-rail-logo height exactly */
+  .sidebar-logo-spacer {
+    height: 3.25rem;
+    flex-shrink: 0;
+    border-bottom: 1px solid rgba(148, 163, 184, 0.2);
+  }
+  /* Label panel nav â€” same padding as rail nav */
+  .sidebar-label-nav {
+    flex: 1;
+    overflow-y: auto;
+    padding: 0.5rem 0;
+  }
+  .sidebar-nav { display: flex; flex-direction: column; }
+  .sidebar-nav-wrap { position: relative; }
+  /* Rail icon buttons â€” fixed height, no margin/gap so they stack cleanly */
+  .sidebar-rail-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3rem;
+    height: 3rem;
+    border-radius: 1.25rem;
+    color: rgba(226, 232, 240, 0.68);
+    transition: background 0.18s ease, color 0.18s ease;
+    cursor: pointer;
+    position: relative;
+    border: none;
+    background: transparent;
+    flex-shrink: 0;
+  }
+  .sidebar-rail-icon:hover { background: rgba(148, 163, 184, 0.16); color: #ffffff; }
+  .sidebar-rail-icon.active { background: rgba(59, 130, 246, 0.24); color: #dbeafe; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
+  /* Label panel links â€” same fixed height as rail icons */
+  .sidebar-link {
+    display: flex;
+    align-items: center;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: rgba(226, 232, 240, 0.82);
+    padding: 0 0.875rem;
+    height: 3rem;
+    border-radius: 0.875rem;
+    margin: 0 0.375rem;
+    width: calc(100% - 0.75rem);
+    box-sizing: border-box;
+    transition: background 0.18s ease, color 0.18s ease;
+    white-space: nowrap;
+    position: relative;
+  }
+  .sidebar-link:hover { background: rgba(148, 163, 184, 0.16); color: #ffffff; }
+  .sidebar-link.active, .sidebar-link.active:hover { background: rgba(59, 130, 246, 0.24); color: #dbeafe; font-weight: 600; box-shadow: inset 0 1px 0 rgba(255,255,255,0.2); }
+  html.dark .sidebar-rail {
+    background: rgba(18, 22, 30, 0.97);
+    border-color: rgba(255,255,255,0.09);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.45), 0 2px 8px rgba(0,0,0,0.3);
+  }
+  html.dark .sidebar-rail-logo {
+    border-bottom-color: rgba(255,255,255,0.08);
+  }
+  html.dark .sidebar-label-panel {
+    background: rgba(28, 33, 46, 0.97);
+    border-color: rgba(255, 255, 255, 0.09);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), 0 2px 8px rgba(0, 0, 0, 0.3);
+  }
+  html.dark .sidebar-logo-spacer {
+    border-bottom-color: rgba(255,255,255,0.08);
+  }
+  html.dark .sidebar-rail-icon {
+    color: rgba(255, 255, 255, 0.45);
+  }
+  html.dark .sidebar-rail-icon:hover {
+    background: rgba(255,255,255,0.1);
+    color: rgba(255,255,255,0.9);
+  }
+  html.dark .sidebar-rail-icon.active {
+    background: rgba(255,255,255,0.18);
+    color: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15);
+  }
+  html.dark .sidebar-link {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  html.dark .sidebar-link:hover {
+    background: rgba(255,255,255,0.08);
+    color: rgba(255,255,255,0.9);
+  }
+  html.dark .sidebar-link.active,
+  html.dark .sidebar-link.active:hover {
+    background: rgba(255,255,255,0.14);
+    color: #ffffff;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  /* Logo chip: dark logo disk reads against navy sidebar */
+  .sidebar-brand-logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    padding: 4px;
+    border-radius: 0.625rem;
+    background: rgba(255, 255, 255, 0.98);
+    box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.12), 0 2px 8px rgba(0, 0, 0, 0.18);
+  }
+  .sidebar-brand-logo-wrap--header {
+    padding: 3px;
+    border-radius: 0.5rem;
+  }
+  .sidebar-brand-logo-wrap img {
+    display: block;
+    border-radius: 0.375rem;
+  }
+  html.dark .sidebar-brand-logo-wrap {
+    background: #cbd5e1;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.22), 0 2px 10px rgba(0, 0, 0, 0.45);
+  }
+  .sidebar-nav-wrap { position: relative; }
+  .sidebar-nav { display: flex; flex-direction: column; }
+  /* Notifications table: unread vs read rows */
+  .notification-row-unread {
+    /* Light mode: soft grey highlight */
+    background-color: #f3f4f6;
+  }
+  .notification-row-read {
+    background-color: transparent;
+  }
+  html.dark .notification-row-unread {
+    /* Dark mode: subtle translucent white overlay */
+    background-color: rgba(255, 255, 255, 0.06);
+  }
+  html.dark .notification-row-read {
+    background-color: transparent;
+  }
+  .notification-row-unread .notification-status-dot {
+    background-color: #3b82f6;
+  }
+  .notification-row-read .notification-status-dot {
+    background-color: transparent;
+    border: 1px solid #cbd5e1;
+  }
+  html.dark .notification-row-unread .notification-status-dot {
+    background-color: #38bdf8;
+  }
+  html.dark .notification-row-read .notification-status-dot {
+    background-color: transparent;
+    border-color: #64748b;
+  }
+  .header-notification-dot {
+    background-color: #3b82f6;
+  }
+  .header-notification-item-read .header-notification-dot {
+    background-color: transparent;
+    border: 1px solid #cbd5e1;
+  }
+  html.dark .header-notification-dot {
+    background-color: #38bdf8;
+  }
+  html.dark .header-notification-item-read .header-notification-dot {
+    background-color: transparent;
+    border-color: #64748b;
+  }
+  @keyframes header-bell-ring {
+    0% { transform: rotate(0deg); }
+    15% { transform: rotate(12deg); }
+    30% { transform: rotate(-10deg); }
+    45% { transform: rotate(8deg); }
+    60% { transform: rotate(-6deg); }
+    75% { transform: rotate(4deg); }
+    90% { transform: rotate(-2deg); }
+    100% { transform: rotate(0deg); }
+  }
+  .header-bell-has-unread {
+    animation: header-bell-ring 1.2s ease-in-out infinite;
+    transform-origin: 50% 10%;
+  }
+  /* Audit trail / DataTables: auto-adjust layout â€“ no squished columns; scroll when needed */
+  .audit-trail-table-wrap {
+    max-width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    contain: layout style;
+    padding: clamp(0.5rem, 1.2vw, 0.75rem) clamp(0.75rem, 1.5vw, 1rem);
+  }
+  /* Tickets table: containment clips floating radial menus — disable only on this combo */
+  .audit-trail-table-wrap.tickets-table-scroll-wrap {
+    contain: none;
+  }
+  /* Tickets page: let the table wrapper shrink so horizontal scroll appears for employee and admin */
+  .tickets-table-scroll-wrap {
+    min-width: 0;
+    width: 100%;
+    max-width: 100%;
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch;
+    box-sizing: border-box;
+  }
+  /* Prevent the card from growing with the table so the inner scroll area is constrained */
+  .tickets-page-card {
+    min-width: 0;
+    max-width: 100%;
+  }
+  /* Ensure DataTables wrapper inside scroll wrap doesn't force the wrap to grow */
+  .tickets-table-scroll-wrap .dataTables_wrapper,
+  .tickets-table-scroll-wrap .dt-container {
+    min-width: 0;
+  }
+  .audit-trail-table-wrap table.display {
+    width: 100%;
+    min-width: 720px;
+    table-layout: auto;
+    font-size: clamp(0.7rem, 1.2vw + 0.5rem, 0.8125rem);
+  }
+  .audit-trail-table-wrap table.display thead th,
+  .audit-trail-table-wrap table.display tbody td {
+    word-wrap: break-word;
+    word-break: break-word;
+    overflow-wrap: break-word;
+    padding: clamp(0.35rem, 1vw + 0.25rem, 0.75rem) clamp(0.4rem, 1vw + 0.3rem, 0.85rem);
+    min-height: clamp(2rem, 4vw + 1rem, 2.75rem);
+    vertical-align: middle;
+  }
+  .audit-trail-table-wrap table.display tbody tr {
+    min-height: clamp(2rem, 4vw + 1rem, 2.75rem);
+  }
+  /* Tickets table: same 10-col layout and min-width for all roles */
+  #tickets-table {
+    min-width: 780px;
+  }
+  #tickets-table.tickets-table-admin {
+    min-width: 780px;
+  }
+  #tickets-table thead th,
+  #tickets-table tbody td {
+    padding: clamp(0.4rem, 1.2vw + 0.2rem, 0.7rem) clamp(0.5rem, 1.2vw + 0.3rem, 0.8rem);
+    min-height: clamp(2.25rem, 5vw + 1.25rem, 3rem);
+    white-space: nowrap;
+  }
+  #tickets-table thead th:last-child,
+  #tickets-table tbody td:last-child {
+    min-width: 4.5rem;
+    white-space: nowrap;
+  }
+  #tickets-table tbody tr {
+    min-height: clamp(2.25rem, 5vw + 1.25rem, 3rem);
+  }
+  #tickets-table .badge-ticket {
+    font-size: inherit;
+    padding: 0.15em 0.5em;
+  }
+  /* Tickets page: responsive header & filter spacing (same for employee & admin) */
+  .tickets-page-header {
+    padding: clamp(0.75rem, 2.5vw, 1.25rem) clamp(1rem, 4vw, 1.5rem) !important;
+  }
+  .tickets-page-filters {
+    padding: clamp(0.4rem, 1.5vw, 0.6rem) clamp(1rem, 4vw, 1.5rem) !important;
+    gap: clamp(0.35rem, 1vw, 0.5rem) !important;
+  }
+  /* Actions column: right-align, stable width, icon row baseline */
+  #app-main-content table.display thead th:last-child:not(.sorting),
+  #app-main-content table.dataTable thead th:last-child,
+  #app-main-content table.recent-tickets-table thead th:last-child {
+    text-align: right;
+    vertical-align: middle;
+  }
+  #app-main-content table.display tbody td:last-child,
+  #app-main-content table.dataTable tbody td:last-child,
+  #app-main-content table.recent-tickets-table tbody td:last-child {
+    text-align: right !important;
+    vertical-align: middle !important;
+    white-space: nowrap;
+    width: 1%;
+  }
+  .table-action-icons {
+    display: inline-flex;
+    flex-wrap: nowrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.375rem;
+    min-height: 2.25rem;
+    line-height: 0;
+  }
+  .table-action-icons > form {
+    display: inline-flex;
+    margin: 0;
+    align-items: center;
+    line-height: 0;
+  }
+  /* Actions column: enough space so icon groups donâ€™t wrap or clip */
+  #users-table thead th:last-child,
+  #users-table tbody td:last-child,
+  #categories-table thead th:last-child,
+  #categories-table tbody td:last-child,
+  #priorities-table thead th:last-child,
+  #priorities-table tbody td:last-child,
+  #audit-users-table thead th:last-child,
+  #audit-users-table tbody td:last-child,
+  #recent-tickets-datatable thead th:last-child,
+  #recent-tickets-datatable tbody td:last-child {
+    min-width: 4.5rem;
+  }
+  #audit-users-table thead th:last-child,
+  #audit-users-table tbody td:last-child {
+    min-width: 6.25rem;
+    width: 6.25rem;
+    white-space: nowrap;
+    text-align: right;
+  }
+  #tickets-table tbody td:last-child {
+    padding-left: clamp(0.5rem, 1.5vw, 0.85rem) !important;
+    padding-right: clamp(0.5rem, 1.5vw, 0.85rem) !important;
+  }
+  /* Floating radial actions (above ⋮): avoid clipping; lift expanded row */
+  .tickets-table-scroll-wrap tbody td.ticket-actions-td {
+    overflow: visible !important;
+  }
+  .tickets-table-scroll-wrap tbody tr:has(.ticket-actions-menu.is-expanded) {
+    position: relative;
+    z-index: 100;
+  }
+  #recent-tickets-datatable tbody td.ticket-actions-td {
+    overflow: visible !important;
+  }
+  #recent-tickets-datatable tbody tr:has(.ticket-actions-menu.is-expanded) {
+    position: relative;
+    z-index: 100;
+  }
+  .ticket-actions-radial-shell {
+    isolation: isolate;
+  }
+  .ticket-actions-radial-shell.ticket-radial-shell-fixed {
+    z-index: 2147483646 !important;
+  }
+  /* Google Maps pin: vivid red on light + dark chips (currentColor / grayscale must not win) */
+  .ticket-actions-radial-track a.ticket-actions-maps-link .ticket-maps-pin-svg:not(.ticket-maps-pin-svg--muted) {
+    filter: drop-shadow(0 0 1px rgba(0, 0, 0, 0.35)) drop-shadow(0 1px 2px rgba(0, 0, 0, 0.28)) !important;
+  }
+  .ticket-maps-pin-svg .maps-pin-body {
+    fill: #c5221f !important;
+  }
+  .dark .ticket-actions-radial-track a.ticket-actions-maps-link .ticket-maps-pin-svg:not(.ticket-maps-pin-svg--muted) .maps-pin-body {
+    fill: #ff5f52 !important;
+  }
+  .ticket-maps-pin-svg .maps-pin-dot {
+    fill: #ffffff !important;
+  }
+  .ticket-maps-pin-svg--muted .maps-pin-body {
+    fill: #94a3b8 !important;
+  }
+  .ticket-maps-pin-svg--muted .maps-pin-dot {
+    fill: #e2e8f0 !important;
+  }
+  .dark .ticket-maps-pin-svg--muted .maps-pin-body {
+    fill: #64748b !important;
+  }
+  .dark .ticket-maps-pin-svg--muted .maps-pin-dot {
+    fill: #cbd5e1 !important;
+  }
+  /* Force circular action chips (override table / DataTables button defaults) */
+  .ticket-actions-radial-track .ticket-actions-radial-item.ticket-actions-maps-link,
+  .ticket-actions-radial-track button.ticket-actions-radial-item {
+    display: inline-flex !important;
+    align-items: center;
+    justify-content: center;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    min-width: 2.25rem !important;
+    min-height: 2.25rem !important;
+    max-width: 2.25rem !important;
+    max-height: 2.25rem !important;
+    padding: 0 !important;
+    border-radius: 9999px !important;
+    overflow: hidden;
+    box-sizing: border-box;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .ticket-actions-radial-track form.ticket-actions-radial-item {
+    display: flex !important;
+    width: 2.25rem !important;
+    height: 2.25rem !important;
+    min-width: 2.25rem !important;
+    min-height: 2.25rem !important;
+    max-width: 2.25rem !important;
+    max-height: 2.25rem !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border: none !important;
+    border-radius: 9999px !important;
+    overflow: hidden;
+    box-sizing: border-box;
+    align-items: stretch;
+    justify-content: center;
+  }
+  .ticket-actions-radial-track form.ticket-actions-radial-item button {
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 0 !important;
+    border-radius: 9999px !important;
+    padding: 0 !important;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .ticket-actions-radial-track a.ticket-actions-maps-link.ticket-actions-radial-item {
+    background-color: #fff7f7 !important;
+    border: 1px solid rgba(220, 38, 38, 0.35) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset, 0 1px 2px rgba(197, 34, 31, 0.12) !important;
+  }
+  .dark .ticket-actions-radial-track a.ticket-actions-maps-link.ticket-actions-radial-item {
+    background-color: rgba(69, 10, 10, 0.92) !important;
+    border-color: rgba(248, 113, 113, 0.45) !important;
+    box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.06) inset !important;
+  }
+  /* Ticket row radial “bee” fly-out: burst from center, return on close */
+  .ticket-actions-radial-track .ticket-actions-radial-item {
+    transform-origin: center center;
+    will-change: transform, opacity;
+    transform: translate3d(var(--bee-tx, 0px), var(--bee-ty, 0px), 0) scale(0.35);
+    opacity: 0;
+    transition:
+      transform 0.48s cubic-bezier(0.28, 1.55, 0.42, 1),
+      opacity 0.38s cubic-bezier(0.33, 1, 0.68, 1);
+  }
+  .ticket-actions-radial-track.is-radial-items-out .ticket-actions-radial-item {
+    transform: translate3d(0, 0, 0) scale(1);
+    opacity: 1;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .ticket-actions-radial-track .ticket-actions-radial-item {
+      transition-duration: 0.1s;
+      transition-delay: 0ms !important;
+    }
+  }
+  /* Mobile/tablet: keep desktop-sized tables, use horizontal scroll only */
+  @media (max-width: 1023px) {
+    .audit-trail-table-wrap table.display {
+      min-width: 980px !important;
+      font-size: 0.875rem !important;
+    }
+    #tickets-table,
+    #tickets-table.tickets-table-admin {
+      min-width: 1260px !important;
+    }
+    .audit-trail-table-wrap table.display thead th,
+    .audit-trail-table-wrap table.display tbody td,
+    #tickets-table thead th,
+    #tickets-table tbody td {
+      padding: 0.75rem 0.75rem !important;
+      min-height: 2.5rem !important;
+      font-size: 0.875rem !important;
+      white-space: nowrap !important;
+    }
+    #tickets-table .badge-ticket {
+      font-size: 0.75rem !important;
+      padding: 0.2rem 0.55rem !important;
+    }
+  }
+  /* Small mobile: keep same sizing, still scrollable */
+  @media (max-width: 767px) {
+    .audit-trail-table-wrap table.display {
+      font-size: 0.875rem !important;
+      min-width: 980px !important;
+    }
+    #tickets-table {
+      min-width: 1260px !important;
+    }
+    #tickets-table.tickets-table-admin {
+      min-width: 1260px !important;
+    }
+    #tickets-table thead th:last-child,
+    #tickets-table tbody td:last-child {
+      min-width: 5rem !important;
+      white-space: nowrap !important;
+    }
+    .audit-trail-table-wrap table.display thead th,
+    .audit-trail-table-wrap table.display tbody td {
+      padding: 0.75rem 0.75rem !important;
+      min-height: 2.5rem !important;
+      white-space: nowrap !important;
+    }
+    #tickets-table thead th,
+    #tickets-table tbody td {
+      padding: 0.75rem 0.75rem !important;
+      min-height: 2.5rem !important;
+      white-space: nowrap !important;
+    }
+    #tickets-table .badge-ticket {
+      font-size: 0.75rem !important;
+      padding: 0.2rem 0.55rem !important;
+    }
+  }
+  /* Small phones: keep all columns visible (still scrollable) */
+  @media (max-width: 480px) {
+    #tickets-table thead tr th:nth-child(3),
+    #tickets-table thead tr th:nth-child(4),
+    #tickets-table thead tr th:nth-child(6),
+    #tickets-table thead tr th:nth-child(7),
+    #tickets-table thead tr th:nth-child(8),
+    #tickets-table thead tr th:nth-child(9),
+    #tickets-table tbody tr td:nth-child(3),
+    #tickets-table tbody tr td:nth-child(4),
+    #tickets-table tbody tr td:nth-child(6),
+    #tickets-table tbody tr td:nth-child(7),
+    #tickets-table tbody tr td:nth-child(8),
+    #tickets-table tbody tr td:nth-child(9) {
+      display: table-cell !important;
+    }
+  }
+  @media (max-width: 479px) {
+    .audit-trail-table-wrap table.display,
+    #tickets-table,
+    #tickets-table.tickets-table-admin {
+      min-width: 1260px !important;
+    }
+    .audit-trail-table-wrap table.display thead th,
+    .audit-trail-table-wrap table.display tbody td,
+    #tickets-table thead th,
+    #tickets-table tbody td {
+      padding: 0.75rem 0.75rem !important;
+      min-height: 2.5rem !important;
+      font-size: 0.875rem !important;
+    }
+  }
+  /* Employee dashboard: compact on mobile so it fits */
+  @media (max-width: 767px) {
+    .employee-dashboard-stats .rounded-2xl {
+      padding: 0.5rem 0.75rem;
+    }
+    .employee-dashboard-stats p.text-sm {
+      font-size: 0.7rem;
+    }
+    .employee-dashboard-stats p.text-2xl {
+      font-size: 1.1rem;
+      margin-top: 0.15rem;
+    }
+    .employee-dashboard-stats .flex.h-12.w-12 {
+      height: 2rem;
+      width: 2rem;
+    }
+    .employee-dashboard-stats .flex.h-12.w-12 svg {
+      height: 1rem;
+      width: 1rem;
+    }
+    .employee-dashboard-stats a.text-sm {
+      font-size: 0.65rem;
+      margin-top: 0.25rem;
+    }
+  }
+
+  /* Mobile sidebar: floating overlay panel, content stays fixed */
+  .sidebar-mobile-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 45;
+    background: rgba(2, 6, 23, 0.5);
+    -webkit-backdrop-filter: blur(2px);
+    backdrop-filter: blur(2px);
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.2s ease;
+  }
+  @media (max-width: 1023px) {
+    /* CP/mobile: bottom bar with icons only */
+    .sidebar-drawer {
+      position: fixed !important;
+      left: 0;
+      right: 0;
+      top: auto !important;
+      bottom: 0;
+      z-index: 70;
+      width: 100%;
+      pointer-events: auto;
+    }
+    .sidebar-panel {
+      width: 100%;
+      height: auto;
+      display: block;
+      position: static;
+      overflow: visible;
+      pointer-events: auto;
+    }
+    .sidebar-label-panel,
+    .sidebar-rail-logo,
+    .sidebar-mobile-backdrop,
+    #sidebar-collapse-btn {
+      display: none !important;
+    }
+    .sidebar-rail {
+      width: calc(100% - 1rem);
+      min-width: 0;
+      height: auto;
+      margin: 0 0.5rem 0.5rem;
+      border-radius: 1.1rem;
+      border: 1px solid rgba(148, 163, 184, 0.24);
+      box-shadow: 0 10px 30px rgba(2, 6, 23, 0.35), 0 2px 10px rgba(2, 6, 23, 0.22);
+      padding: 0.35rem 0.2rem;
+    }
+    .sidebar-rail-nav {
+      width: 100%;
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 0.15rem;
+      padding: 0;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scrollbar-width: none;
+    }
+    .sidebar-rail-nav::-webkit-scrollbar {
+      display: none;
+      width: 0;
+      height: 0;
+    }
+    .sidebar-rail-icon {
+      width: 3.25rem;
+      min-width: 3.25rem;
+      height: 3.25rem;
+      border-radius: 0.9rem;
+      margin: 0;
+      flex-shrink: 0;
+    }
+    .sidebar-rail-icon svg {
+      width: 1.5rem !important;
+      height: 1.5rem !important;
+    }
+    #app-shell-main {
+      margin-left: 0 !important;
+      padding-bottom: 5rem;
+    }
+    body.mobile-sidebar-open {
+      overflow: auto;
+      touch-action: auto;
+    }
+  }
+  @media (max-width: 479px) {
+    .employee-dashboard-stats .rounded-2xl {
+      padding: 0.4rem 0.5rem;
+    }
+    .employee-dashboard-stats p.text-sm {
+      font-size: 0.65rem;
+    }
+    .employee-dashboard-stats p.text-2xl {
+      font-size: 1rem;
+    }
+    .employee-dashboard-stats .flex.h-12.w-12 {
+      height: 1.75rem;
+      width: 1.75rem;
+    }
+    .employee-dashboard-stats a.text-sm {
+      font-size: 0.6rem;
+    }
+  }
+  /* DataTables controls: fit on mobile */
+  @media (max-width: 767px) {
+    #app-main-content .dataTables_wrapper .dt-container .dt-length,
+    #app-main-content .dataTables_wrapper .dt-container .dt-search,
+    #app-main-content .dataTables_wrapper .row:first-child {
+      display: block;
+      margin-bottom: 0.5rem;
+    }
+    #app-main-content .dataTables_wrapper .dt-container .dt-paging {
+      margin-top: 0.5rem;
+    }
+    #app-main-content .dataTables_wrapper label,
+    #app-main-content .dataTables_wrapper input,
+    #app-main-content .dataTables_wrapper select,
+    #app-main-content .dt-container label,
+    #app-main-content .dt-container input,
+    #app-main-content .dt-container select {
+      font-size: 0.7rem !important;
+    }
+    #app-main-content .dataTables_wrapper .dt-container .dt-paging button,
+    #app-main-content .dataTables_wrapper .dataTables_paginate span {
+      font-size: 0.7rem;
+      padding: 0.2rem 0.4rem;
+    }
+  }
+  /* Slide page transition (View Transitions API) */
+  #app-main-content {
+    view-transition-name: main-content;
+  }
+  ::view-transition-old(main-content) {
+    animation: slide-out-up 0s forwards;
+  }
+  ::view-transition-new(main-content) {
+    animation: slide-in-up 0s forwards;
+  }
+  @keyframes slide-out-up {
+    to {
+      transform: translateY(-24%);
+      opacity: 0;
+    }
+  }
+  @keyframes slide-in-up {
+    from {
+      transform: translateY(24%);
+      opacity: 0.6;
+    }
+    to {
+      transform: translateY(0);
+      opacity: 1;
+    }
+  }
+
+  /* Instant feedback while content loads (SPA-style navigation) */
+  #app-main-content.content-loading {
+    opacity: 0.88;
+    pointer-events: none;
+    transition: opacity 0.06s ease-out;
+  }
+}
+
+/* Global toast notifications */
+.app-toast-root {
+  position: fixed;
+  inset-inline-end: 1.25rem;
+  inset-block-start: 1.25rem;
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  pointer-events: none;
+}
+.app-toast {
+  pointer-events: auto;
+  min-width: 240px;
+  max-width: 320px;
+  padding: 0.75rem 0.9rem;
+  border-radius: 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.3;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.5rem;
+  box-shadow: 0 20px 25px -5px rgba(15, 23, 42, 0.25), 0 10px 10px -5px rgba(15, 23, 42, 0.2);
+  background: rgba(15, 23, 42, 0.96);
+  color: #e5e7eb;
+  border: 1px solid rgba(148, 163, 184, 0.7);
+  animation: app-toast-in 0.18s ease-out, app-toast-out 0.2s ease-in forwards;
+  animation-delay: 0s, 3.2s;
+}
+.app-toast-icon {
+  flex-shrink: 0;
+  margin-top: 0.1rem;
+}
+.app-toast-close {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+  padding: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+.app-toast-close:hover {
+  opacity: 1;
+}
+@keyframes app-toast-in {
+  from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes app-toast-out {
+  to {
+    opacity: 0;
+    transform: translateY(-4px) scale(0.98);
+  }
+}
+html.dark .app-toast {
+  background: rgba(15, 23, 42, 0.98);
+  border-color: rgba(148, 163, 184, 0.85);
+}
+
+/* Remove text selection highlight on DataTables controls */
+html.dark #app-main-content .dataTables_wrapper label,
+html.dark #app-main-content .dataTables_wrapper .dataTables_length,
+html.dark #app-main-content .dataTables_wrapper .dataTables_filter,
+html.dark #app-main-content .dataTables_wrapper .dataTables_info,
+html.dark #app-main-content .dt-container .dt-length,
+html.dark #app-main-content .dt-container .dt-search,
+html.dark #app-main-content .dt-container .dt-info {
+  -webkit-user-select: none;
+  user-select: none;
+  background: transparent !important;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Remove white text selection highlight â€” use subtle blue instead */
+::selection {
+  background: rgba(37, 99, 235, 0.35);
+  color: #ffffff;
+}
+::-moz-selection {
+  background: rgba(37, 99, 235, 0.35);
+  color: #ffffff;
+}
+
+/* Uiverse primary button style applied to shared action button pattern */
+button.cursor-pointer.transition-all.bg-gray-700.text-white {
+  border: 2px solid #24b4fb !important;
+  background-color: #24b4fb !important;
+  border-radius: 0.9em !important;
+  padding: 0.8em 1.2em 0.8em 1em !important;
+  transition: all ease-in-out 0.2s !important;
+  font-size: 16px !important;
+  color: #ffffff !important;
+  box-shadow: none !important;
+}
+
+button.cursor-pointer.transition-all.bg-gray-700.text-white:hover {
+  background-color: #0071e2 !important;
+  filter: none !important;
+  transform: none !important;
+  box-shadow: none !important;
+}
+
+/* Tickets table: keep Ticket # values blue (override broad dark table rules) */
+#app-main-content table#tickets-table tbody td:nth-child(1),
+#app-main-content table#tickets-table tbody td:nth-child(1) * {
+  color: #2563eb !important;
+  font-weight: 600;
+}
+
+html.dark #app-main-content table#tickets-table tbody td:nth-child(1),
+html.dark #app-main-content table#tickets-table tbody td:nth-child(1) * {
+  color: #60a5fa !important;
+}
+
+/* Mobile dropdown fit for header notifications/password reset */
+@media (max-width: 767px) {
+  #header-notifications-panel,
+  #pw-reset-panel {
+    position: fixed !important;
+    left: 0.5rem !important;
+    right: 0.5rem !important;
+    width: auto !important;
+    max-width: calc(100vw - 1rem) !important;
+    top: 4.25rem !important;
+  }
+  #header-notifications-list,
+  #pw-reset-list {
+    max-height: 52vh !important;
+  }
+}
+
+@media (max-width: 1023px) {
+  body.customize-modal-open .sidebar-drawer {
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+}
+
+/* Auto-hide top header on downward scroll */
+#app-top-header {
+  transition: transform 220ms ease, opacity 220ms ease;
+  will-change: transform, opacity;
+}
+
+#app-top-header.header-hidden-on-scroll {
+  transform: translateY(calc(-100% - 0.75rem));
+  opacity: 0.98;
+}
+
+/* Submit ticket modal: force full dark-blue theme in dark mode */
+html.dark #submit-ticket-modal [aria-labelledby="submit-ticket-modal-title"],
+html.dark #submit-ticket-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #submit-ticket-modal #submit-ticket-modal-title,
+html.dark #submit-ticket-modal #submit-ticket-modal-title + p,
+html.dark #submit-ticket-modal label,
+html.dark #submit-ticket-modal .text-slate-600,
+html.dark #submit-ticket-modal .text-slate-500,
+html.dark #submit-ticket-modal .text-slate-400 {
+  color: #e2e8f0 !important;
+}
+
+html.dark #submit-ticket-modal .max-h-\[80vh\] {
+  background-color: #0b1020 !important;
+}
+
+html.dark #submit-ticket-modal .input-ticket,
+html.dark #submit-ticket-modal input,
+html.dark #submit-ticket-modal select,
+html.dark #submit-ticket-modal textarea,
+html.dark #submit-ticket-modal .bg-white {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+html.dark #submit-ticket-modal #st_category_id,
+html.dark #submit-ticket-modal #st_priority,
+html.dark #submit-ticket-modal #modal_category_id,
+html.dark #submit-ticket-modal #modal_priority {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+html.dark #submit-ticket-modal #st_category_id option,
+html.dark #submit-ticket-modal #st_priority option,
+html.dark #submit-ticket-modal #modal_category_id option,
+html.dark #submit-ticket-modal #modal_priority option,
+html.dark #submit-ticket-modal select option {
+  background-color: #0f172a !important;
+  color: #f8fafc !important;
+}
+
+html.dark #submit-ticket-modal input::placeholder,
+html.dark #submit-ticket-modal textarea::placeholder {
+  color: rgba(191, 219, 254, 0.72) !important;
+}
+
+html.dark #submit-ticket-modal #submit-ticket-cancel {
+  background-color: #111a33 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+/* Customize Form modal: dark mode theme only */
+html.dark #it-categories-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #it-categories-modal > div > div:first-child {
+  background-color: #0f172a !important;
+  border-color: rgba(59, 130, 246, 0.4) !important;
+}
+
+html.dark #it-categories-modal #it-categories-title,
+html.dark #it-categories-modal .text-slate-900,
+html.dark #it-categories-modal .text-slate-700,
+html.dark #it-categories-modal .text-slate-600,
+html.dark #it-categories-modal .text-slate-500,
+html.dark #it-categories-modal .text-slate-400 {
+  color: #e2e8f0 !important;
+}
+
+html.dark #it-categories-modal .bg-white,
+html.dark #it-categories-modal .bg-white\/95,
+html.dark #it-categories-modal .bg-slate-50\/60,
+html.dark #it-categories-modal .bg-slate-50 {
+  background-color: #111a33 !important;
+}
+
+html.dark #it-categories-modal .border-slate-200,
+html.dark #it-categories-modal .border-slate-100,
+html.dark #it-categories-modal .border-slate-300 {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #it-categories-modal input,
+html.dark #it-categories-modal select,
+html.dark #it-categories-modal textarea {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #it-categories-modal input::placeholder,
+html.dark #it-categories-modal textarea::placeholder {
+  color: rgba(191, 219, 254, 0.72) !important;
+}
+
+html.dark #it-categories-modal table thead tr,
+html.dark #it-categories-modal table tbody tr {
+  border-color: rgba(59, 130, 246, 0.25) !important;
+  background-color: #0b1020 !important;
+}
+
+/* Customize Form modal action icons: improve contrast/visibility */
+html.dark #it-categories-modal .it-cat-edit-btn,
+html.dark #it-categories-modal .it-pri-edit-btn {
+  background-color: #1e293b !important;
+  color: #bfdbfe !important;
+  border: 1px solid rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #it-categories-modal .it-cat-edit-btn:hover,
+html.dark #it-categories-modal .it-pri-edit-btn:hover {
+  background-color: #334155 !important;
+  color: #dbeafe !important;
+}
+
+html.dark #it-categories-modal .it-cat-del-btn,
+html.dark #it-categories-modal .it-pri-del-btn {
+  background-color: rgba(127, 29, 29, 0.45) !important;
+  color: #fecaca !important;
+  border: 1px solid rgba(248, 113, 113, 0.45) !important;
+}
+
+html.dark #it-categories-modal .it-cat-del-btn:hover,
+html.dark #it-categories-modal .it-pri-del-btn:hover {
+  background-color: rgba(153, 27, 27, 0.55) !important;
+  color: #fee2e2 !important;
+}
+
+/* Ticket edit modal: remove white fields on dark modal */
+html.dark #ticket-quick-view-modal .ajax-ticket-edit-form .input-ticket,
+html.dark #ticket-quick-view-modal .ajax-ticket-edit-form input,
+html.dark #ticket-quick-view-modal .ajax-ticket-edit-form select,
+html.dark #ticket-quick-view-modal .ajax-ticket-edit-form textarea {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #ticket-quick-view-modal .ajax-ticket-edit-form input::placeholder,
+html.dark #ticket-quick-view-modal .ajax-ticket-edit-form textarea::placeholder {
+  color: rgba(191, 219, 254, 0.72) !important;
+}
+
+/* Global light-mode fix for IT/help and ticket quick-view modals */
+html:not(.dark) #it-help-request-modal > div,
+html:not(.dark) #ticket-quick-view-modal > div {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+html:not(.dark) #it-help-request-modal > div > div:first-child,
+html:not(.dark) #ticket-quick-view-modal > div > div:first-child {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+html:not(.dark) #it-help-request-modal #it-help-threads-view,
+html:not(.dark) #it-help-request-modal #it-help-messages,
+html:not(.dark) #ticket-quick-view-body {
+  background-color: #ffffff !important;
+}
+html:not(.dark) #it-help-request-modal #it-help-request-title,
+html:not(.dark) #it-help-request-modal #it-help-request-title + p,
+html:not(.dark) #ticket-quick-view-title,
+html:not(.dark) #ticket-quick-view-subtitle {
+  color: #0f172a !important;
+}
+html:not(.dark) #it-help-request-modal .border-blue-800\/70,
+html:not(.dark) #it-help-request-modal .border-blue-900\/70,
+html:not(.dark) #it-help-request-modal .divide-blue-900\/50,
+html:not(.dark) #ticket-quick-view-modal .border-blue-800\/70,
+html:not(.dark) #ticket-quick-view-modal .border-blue-900\/70 {
+  border-color: #e2e8f0 !important;
+}
+html:not(.dark) #ticket-quick-view-body .space-y-5.rounded-xl {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+html:not(.dark) #ticket-quick-view-body section {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+html:not(.dark) #ticket-quick-view-body h2,
+html:not(.dark) #ticket-quick-view-body h3,
+html:not(.dark) #ticket-quick-view-body dt,
+html:not(.dark) #ticket-quick-view-body dd,
+html:not(.dark) #ticket-quick-view-body p {
+  color: #0f172a !important;
+}
+html:not(.dark) #ticket-quick-view-body a {
+  color: #2563eb !important;
+}
+html:not(.dark) #ticket-quick-view-body .inline-flex.items-center.rounded-lg.border {
+  background-color: #f8fafc !important;
+  border-color: #cbd5e1 !important;
+  color: #334155 !important;
+}
+
+/* Audit activity modal: dark-blue theme in dark mode */
+html.dark #audit-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #audit-modal > div > div:first-child {
+  background-color: #0f172a !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #audit-modal #audit-modal-title,
+html.dark #audit-modal #audit-modal-subtitle,
+html.dark #audit-modal .text-slate-900,
+html.dark #audit-modal .text-slate-700,
+html.dark #audit-modal .text-slate-600,
+html.dark #audit-modal .text-slate-500 {
+  color: #e2e8f0 !important;
+}
+
+html.dark #audit-modal #audit-modal-download,
+html.dark #audit-modal #audit-modal-print {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #audit-modal #audit-modal-download:hover,
+html.dark #audit-modal #audit-modal-print:hover {
+  background-color: #1e293b !important;
+}
+
+html.dark #audit-modal table,
+html.dark #audit-modal thead,
+html.dark #audit-modal tbody,
+html.dark #audit-modal tr {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.25) !important;
+}
+
+html.dark #audit-modal thead th,
+html.dark #audit-modal tbody td {
+  color: #e2e8f0 !important;
+  border-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+/* Ticket activity modal: hide scrollbar while keeping scroll */
+#audit-modal .audit-modal-body-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#audit-modal .audit-modal-body-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Create ticket modal: hide scrollbar while keeping scroll */
+#submit-ticket-modal .submit-ticket-modal-body-scroll {
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+#submit-ticket-modal .submit-ticket-modal-body-scroll::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+
+/* Delete confirm modal: dark-blue in dark mode */
+html.dark #index-delete-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #index-delete-modal #index-delete-modal-title {
+  color: #f8fafc !important;
+}
+
+html.dark #index-delete-modal #index-delete-modal-message {
+  color: #cbd5e1 !important;
+}
+
+html.dark #index-delete-modal #index-delete-modal-cancel {
+  background-color: #24b4fb !important;
+  color: #f8fafc !important;
+  border-color: #24b4fb !important;
+}
+
+html.dark #index-delete-modal #index-delete-modal-cancel:hover {
+  background-color: #0071e2 !important;
+}
+
+/* Profile modal: dark-blue theme in dark mode */
+html.dark #profile-settings-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #profile-settings-modal > div > div:first-child {
+  background-color: #0f172a !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #profile-settings-modal #profile-settings-title,
+html.dark #profile-settings-modal .text-slate-900,
+html.dark #profile-settings-modal .text-slate-700,
+html.dark #profile-settings-modal .text-slate-600,
+html.dark #profile-settings-modal .text-slate-500,
+html.dark #profile-settings-modal .text-slate-400 {
+  color: #e2e8f0 !important;
+}
+
+html.dark #profile-settings-modal .border-slate-200,
+html.dark #profile-settings-modal .border-slate-100,
+html.dark #profile-settings-modal .border-slate-300 {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #profile-settings-modal .bg-white,
+html.dark #profile-settings-modal .bg-white\/95,
+html.dark #profile-settings-modal .bg-slate-50\/50,
+html.dark #profile-settings-modal .bg-slate-50 {
+  background-color: #111a33 !important;
+}
+
+html.dark #profile-settings-modal input,
+html.dark #profile-settings-modal select,
+html.dark #profile-settings-modal textarea {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #profile-settings-modal input::placeholder,
+html.dark #profile-settings-modal textarea::placeholder {
+  color: rgba(191, 219, 254, 0.72) !important;
+}
+
+html.dark #profile-settings-modal .js-close-profile-modal {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #profile-settings-modal .js-close-profile-modal:hover {
+  background-color: #1e293b !important;
+}
+
+/* New staff announcement modal: dark-blue theme in dark mode */
+html.dark #new-announcement-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #new-announcement-modal > div > div:first-child {
+  background-color: #0f172a !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #new-announcement-modal .text-slate-900,
+html.dark #new-announcement-modal .text-slate-700,
+html.dark #new-announcement-modal .text-slate-600,
+html.dark #new-announcement-modal .text-slate-500,
+html.dark #new-announcement-modal .text-slate-400 {
+  color: #e2e8f0 !important;
+}
+
+html.dark #new-announcement-modal .border-slate-200,
+html.dark #new-announcement-modal .border-slate-300,
+html.dark #new-announcement-modal .border-slate-100 {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #new-announcement-modal .bg-white,
+html.dark #new-announcement-modal .bg-white\/95,
+html.dark #new-announcement-modal .bg-slate-50,
+html.dark #new-announcement-modal .bg-slate-50\/50 {
+  background-color: #111a33 !important;
+}
+
+html.dark #new-announcement-modal input,
+html.dark #new-announcement-modal select,
+html.dark #new-announcement-modal textarea {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #new-announcement-modal input::placeholder,
+html.dark #new-announcement-modal textarea::placeholder {
+  color: rgba(191, 219, 254, 0.72) !important;
+}
+
+html.dark #new-announcement-modal button[id$="-close"],
+html.dark #new-announcement-modal button[type="button"] {
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+/* Ticket submitted success modal: theme-aware */
+html.dark #ticket-create-success-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+html.dark #ticket-create-success-modal #ticket-create-success-title,
+html.dark #ticket-create-success-modal #ticket-create-success-subtitle {
+  color: #e2e8f0 !important;
+}
+html.dark #ticket-create-success-modal #ticket-create-success-close,
+html.dark #ticket-create-success-modal #ticket-create-success-stay {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+html.dark #ticket-create-success-modal #ticket-create-success-close:hover,
+html.dark #ticket-create-success-modal #ticket-create-success-stay:hover {
+  background-color: #1e293b !important;
+}
+html.dark #ticket-create-success-modal #ticket-create-success-number {
+  color: #d1fae5 !important;
+}
+html.dark #ticket-create-success-modal .border-emerald-200.bg-emerald-50 {
+  border-color: rgba(16, 185, 129, 0.45) !important;
+  background-color: rgba(6, 95, 70, 0.22) !important;
+  color: #a7f3d0 !important;
+}
+
+/* Admin settings modal: dark-blue theme in dark mode */
+html.dark #admin-settings-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #admin-settings-modal > div > div:first-child {
+  background-color: #0f172a !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #admin-settings-modal > div > div:nth-child(2) {
+  background-color: #111a33 !important;
+  border-color: rgba(59, 130, 246, 0.3) !important;
+}
+
+html.dark #admin-settings-modal #admin-settings-title,
+html.dark #admin-settings-modal .text-slate-900,
+html.dark #admin-settings-modal .text-slate-800,
+html.dark #admin-settings-modal .text-slate-700,
+html.dark #admin-settings-modal .text-slate-600,
+html.dark #admin-settings-modal .text-slate-500,
+html.dark #admin-settings-modal .text-slate-400 {
+  color: #e2e8f0 !important;
+}
+
+html.dark #admin-settings-modal .border-slate-200,
+html.dark #admin-settings-modal .border-slate-100,
+html.dark #admin-settings-modal .border-slate-300 {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #admin-settings-modal .bg-white,
+html.dark #admin-settings-modal .bg-white\/95,
+html.dark #admin-settings-modal .bg-slate-50,
+html.dark #admin-settings-modal .bg-slate-50\/50 {
+  background-color: #111a33 !important;
+}
+
+html.dark #admin-settings-modal input,
+html.dark #admin-settings-modal select,
+html.dark #admin-settings-modal textarea {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #admin-settings-modal input::placeholder,
+html.dark #admin-settings-modal textarea::placeholder {
+  color: rgba(191, 219, 254, 0.72) !important;
+}
+
+html.dark #admin-settings-modal #admin-settings-close,
+html.dark #admin-settings-modal .js-admin-settings-inner-close,
+html.dark #admin-settings-modal .adm-set-tab {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #admin-settings-modal .adm-set-tab[aria-selected="true"] {
+  background-color: #1d4ed8 !important;
+  border-color: #3b82f6 !important;
+  color: #ffffff !important;
+}
+
+/* Add / Edit user modals: navy panel + light text in dark mode (overrides global html.dark .text-slate-* tints) */
+html.dark #add-user-modal > div,
+html.dark #edit-user-modal > div {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #add-user-modal > div > div:first-child,
+html.dark #edit-user-modal > div > div:first-child {
+  background-color: #0f172a !important;
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #add-user-modal .text-slate-900,
+html.dark #add-user-modal .text-slate-500,
+html.dark #add-user-modal .text-slate-700,
+html.dark #edit-user-modal .text-slate-900,
+html.dark #edit-user-modal .text-slate-500,
+html.dark #edit-user-modal .text-slate-700 {
+  color: #e2e8f0 !important;
+}
+
+html.dark #add-user-modal .border-slate-200,
+html.dark #edit-user-modal .border-slate-200 {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #add-user-modal .bg-white,
+html.dark #add-user-modal .bg-white\/95,
+html.dark #edit-user-modal .bg-white,
+html.dark #edit-user-modal .bg-white\/95 {
+  background-color: #111a33 !important;
+}
+
+html.dark #add-user-modal input,
+html.dark #add-user-modal select,
+html.dark #add-user-modal textarea,
+html.dark #edit-user-modal input,
+html.dark #edit-user-modal select,
+html.dark #edit-user-modal textarea {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #add-user-modal input::placeholder,
+html.dark #add-user-modal textarea::placeholder,
+html.dark #edit-user-modal input::placeholder,
+html.dark #edit-user-modal textarea::placeholder {
+  color: rgba(191, 219, 254, 0.72) !important;
+}
+
+html.dark #add-user-modal select option,
+html.dark #edit-user-modal select option {
+  color: #0f172a !important;
+  background: #ffffff !important;
+}
+
+html.dark #add-user-modal #add-user-cancel,
+html.dark #edit-user-modal #edit-user-cancel {
+  background-color: #111a33 !important;
+  color: #f8fafc !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+}
+
+html.dark #add-user-modal #add-user-cancel:hover,
+html.dark #edit-user-modal #edit-user-cancel:hover {
+  background-color: #1e293b !important;
+}
+
+html.dark #edit-user-modal #edit-user-password-section {
+  border-color: rgba(59, 130, 246, 0.35) !important;
+}
+
+html.dark #add-user-modal #add-user-error,
+html.dark #edit-user-modal #edit-user-error {
+  background-color: rgba(127, 29, 29, 0.28) !important;
+  border-color: rgba(248, 113, 113, 0.45) !important;
+  color: #fecaca !important;
+}
+
+/* Delete confirm modal: ensure dark panel + readable text (wins over .dark [aria-modal] .bg-white) */
+html.dark #index-delete-modal > div.rounded-2xl.border {
+  background-color: #0b1020 !important;
+  border-color: rgba(59, 130, 246, 0.45) !important;
+  color: #f8fafc !important;
+}
+
+html.dark #index-delete-modal #index-delete-modal-title {
+  color: #f8fafc !important;
+}
+
+html.dark #index-delete-modal #index-delete-modal-message {
+  color: #cbd5e1 !important;
+}
+
+/* Unified ticket action chip design across all roles */
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-quick-view-btn,
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-edit-modal-btn,
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-status-modal-btn,
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.index-delete-ticket-btn,
+#app-main-content .ticket-actions-radial-track .ajax-accept-ticket-form button[type="submit"],
+#app-main-content .ticket-actions-radial-track .ajax-close-ticket-form button[type="submit"] {
+  border-radius: 9999px !important;
+  border: 1px solid transparent !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.12) !important;
+  transition: transform 0.15s ease, filter 0.18s ease, box-shadow 0.18s ease !important;
+}
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-quick-view-btn:hover,
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-edit-modal-btn:hover,
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-status-modal-btn:hover,
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.index-delete-ticket-btn:hover,
+#app-main-content .ticket-actions-radial-track .ajax-accept-ticket-form button[type="submit"]:hover,
+#app-main-content .ticket-actions-radial-track .ajax-close-ticket-form button[type="submit"]:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(15, 23, 42, 0.18) !important;
+}
+
+/* Light mode */
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-quick-view-btn {
+  background: #eff6ff !important;
+  color: #1d4ed8 !important;
+  border-color: #bfdbfe !important;
+}
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-edit-modal-btn {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border-color: #cbd5e1 !important;
+}
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-status-modal-btn {
+  background: #fffbeb !important;
+  color: #b45309 !important;
+  border-color: #fde68a !important;
+}
+#app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.index-delete-ticket-btn {
+  background: #fef2f2 !important;
+  color: #b91c1c !important;
+  border-color: #fecaca !important;
+}
+#app-main-content .ticket-actions-radial-track .ajax-accept-ticket-form button[type="submit"],
+#app-main-content .ticket-actions-radial-track .ajax-close-ticket-form button[type="submit"] {
+  background: #ecfdf5 !important;
+  color: #047857 !important;
+  border-color: #a7f3d0 !important;
+}
+
+/* Dark mode */
+html.dark #app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-quick-view-btn {
+  background: rgba(37, 99, 235, 0.28) !important;
+  color: #bfdbfe !important;
+  border-color: rgba(59, 130, 246, 0.55) !important;
+}
+html.dark #app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-edit-modal-btn {
+  background: rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0 !important;
+  border-color: rgba(148, 163, 184, 0.45) !important;
+}
+html.dark #app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.ticket-status-modal-btn {
+  background: rgba(217, 119, 6, 0.3) !important;
+  color: #fde68a !important;
+  border-color: rgba(245, 158, 11, 0.55) !important;
+}
+html.dark #app-main-content .ticket-actions-radial-track .ticket-actions-radial-item.index-delete-ticket-btn {
+  background: rgba(220, 38, 38, 0.32) !important;
+  color: #fecaca !important;
+  border-color: rgba(248, 113, 113, 0.55) !important;
+}
+html.dark #app-main-content .ticket-actions-radial-track .ajax-accept-ticket-form button[type="submit"],
+html.dark #app-main-content .ticket-actions-radial-track .ajax-close-ticket-form button[type="submit"] {
+  background: rgba(22, 163, 74, 0.32) !important;
+  color: #bbf7d0 !important;
+  border-color: rgba(74, 222, 128, 0.6) !important;
+}
+
+/* Icon actions + modal CTAs — same translucent ringed chips as ticket row actions */
+html.dark #app-main-content .audit-view-btn,
+html.dark #it-categories-modal .it-cat-edit-btn {
+  border-radius: 9999px !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(37, 99, 235, 0.28) !important;
+  color: #bfdbfe !important;
+  border: 1px solid rgba(59, 130, 246, 0.55) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25) !important;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+html.dark #app-main-content .audit-view-btn:hover,
+html.dark #it-categories-modal .it-cat-edit-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(37, 99, 235, 0.42) !important;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.3) !important;
+}
+html.dark #app-main-content .ann-delete-btn,
+html.dark #it-categories-modal .it-cat-del-btn {
+  border-radius: 9999px !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(220, 38, 38, 0.32) !important;
+  color: #fecaca !important;
+  border: 1px solid rgba(248, 113, 113, 0.55) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25) !important;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+html.dark #app-main-content .ann-delete-btn:hover,
+html.dark #it-categories-modal .it-cat-del-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(220, 38, 38, 0.48) !important;
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.28) !important;
+}
+html.dark #app-main-content #new-announcement-btn {
+  border-radius: 9999px !important;
+  background: rgba(37, 99, 235, 0.32) !important;
+  color: #e0f2fe !important;
+  border: 1px solid rgba(59, 130, 246, 0.55) !important;
+  border-bottom-width: 1px !important;
+  box-shadow: 0 2px 12px rgba(37, 99, 235, 0.22) !important;
+}
+html.dark #app-main-content #new-announcement-btn:hover {
+  background: rgba(37, 99, 235, 0.48) !important;
+  box-shadow: 0 6px 20px rgba(37, 99, 235, 0.32) !important;
+  transform: translateY(-1px) !important;
+}
+html.dark #it-categories-modal #it-cat-save {
+  border-radius: 9999px !important;
+  background: rgba(37, 99, 235, 0.32) !important;
+  color: #e0f2fe !important;
+  border: 1px solid rgba(59, 130, 246, 0.55) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.2) !important;
+}
+html.dark #it-categories-modal #it-cat-save:hover:not(:disabled) {
+  background: rgba(37, 99, 235, 0.48) !important;
+}
+html.dark #it-categories-modal #it-cat-cancel-edit:not(.hidden) {
+  border-radius: 9999px !important;
+  background: rgba(148, 163, 184, 0.18) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.4) !important;
+}
+html.dark #it-categories-modal #it-cat-cancel-edit:not(.hidden):hover {
+  background: rgba(148, 163, 184, 0.28) !important;
+}
+
+/* Admin / users tables: edit + delete icon cells */
+html.dark #app-main-content .table-action-icons > a[aria-label="Edit"],
+html.dark #app-main-content .table-action-icons .user-edit-btn {
+  border-radius: 9999px !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25) !important;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+html.dark #app-main-content .table-action-icons > a[aria-label="Edit"]:hover,
+html.dark #app-main-content .table-action-icons .user-edit-btn:hover {
+  transform: translateY(-1px);
+  background: rgba(148, 163, 184, 0.32) !important;
+  box-shadow: 0 6px 18px rgba(148, 163, 184, 0.2) !important;
+}
+html.dark #app-main-content .table-action-icons form button[type="submit"][aria-label="Delete"] {
+  border-radius: 9999px !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  background: rgba(220, 38, 38, 0.32) !important;
+  color: #fecaca !important;
+  border: 1px solid rgba(248, 113, 113, 0.55) !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25) !important;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+html.dark #app-main-content .table-action-icons form button[type="submit"][aria-label="Delete"]:hover {
+  transform: translateY(-1px);
+  background: rgba(220, 38, 38, 0.48) !important;
+  box-shadow: 0 6px 18px rgba(220, 38, 38, 0.28) !important;
+}
+
+/* Hide quick-view scrollbar but keep scrolling functional */
+#ticket-quick-view-body {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+#ticket-quick-view-body::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
+/* Modal close (×): same chip language as ticket edit action — slate ring, circular */
+html.dark button[aria-label="Close"] {
+  background: rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25) !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease !important;
+}
+html.dark button[aria-label="Close"]:hover {
+  transform: translateY(-1px);
+  background: rgba(148, 163, 184, 0.32) !important;
+  border-color: rgba(203, 213, 225, 0.55) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 6px 18px rgba(148, 163, 184, 0.18) !important;
+}
+
+html:not(.dark) button[aria-label="Close"] {
+  background: #f1f5f9 !important;
+  color: #334155 !important;
+  border: 1px solid #cbd5e1 !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.08) !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease !important;
+}
+html:not(.dark) button[aria-label="Close"]:hover {
+  transform: translateY(-1px);
+  background: #e2e8f0 !important;
+  border-color: #94a3b8 !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 14px rgba(15, 23, 42, 0.1) !important;
+}
+
+/* Icon close buttons: win over modal panel rules */
+html.dark #announcement-modal-close,
+html.dark #audit-modal-close,
+html.dark #add-user-close,
+html.dark #edit-user-close,
+html.dark #admin-settings-close,
+html.dark #it-help-request-close,
+html.dark #it-categories-close,
+html.dark #all-notifications-modal-close,
+html.dark #submit-ticket-modal-close,
+html.dark #ticket-quick-view-close,
+html.dark #ticket-create-success-close,
+html.dark .js-close-profile-modal[aria-label="Close"] {
+  background: rgba(148, 163, 184, 0.2) !important;
+  color: #e2e8f0 !important;
+  border: 1px solid rgba(148, 163, 184, 0.45) !important;
+  border-radius: 9999px !important;
+  box-shadow: 0 2px 10px rgba(15, 23, 42, 0.25) !important;
+  width: 2.25rem !important;
+  height: 2.25rem !important;
+  min-width: 2.25rem !important;
+  padding: 0 !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transition: transform 0.15s ease, box-shadow 0.18s ease, background 0.18s ease, border-color 0.18s ease !important;
+}
+html.dark #announcement-modal-close:hover,
+html.dark #audit-modal-close:hover,
+html.dark #add-user-close:hover,
+html.dark #edit-user-close:hover,
+html.dark #admin-settings-close:hover,
+html.dark #it-help-request-close:hover,
+html.dark #it-categories-close:hover,
+html.dark #all-notifications-modal-close:hover,
+html.dark #submit-ticket-modal-close:hover,
+html.dark #ticket-quick-view-close:hover,
+html.dark #ticket-create-success-close:hover,
+html.dark .js-close-profile-modal[aria-label="Close"]:hover {
+  transform: translateY(-1px);
+  background: rgba(148, 163, 184, 0.32) !important;
+  border-color: rgba(203, 213, 225, 0.55) !important;
+  color: #f8fafc !important;
+  box-shadow: 0 6px 18px rgba(148, 163, 184, 0.18) !important;
+}
+
+/* Force All Notifications modal dark theme consistency */
+html.dark #all-notifications-modal > div {
+  background: #0f172a !important;
+  border-color: rgba(71, 85, 105, 0.9) !important;
+  color: #f1f5f9 !important;
+}
+html.dark #all-notifications-modal > div > div:first-child {
+  background: rgba(15, 23, 42, 0.96) !important;
+  border-color: rgba(71, 85, 105, 0.8) !important;
+}
+html.dark #all-notifications-modal #all-notifications-tabs {
+  background: transparent !important;
+}
+html.dark #all-notifications-modal #all-notifications-tabs .notif-tab-btn {
+  border-color: rgba(71, 85, 105, 0.85) !important;
+}
+html.dark #all-notifications-modal #all-notifications-modal-body {
+  background: #0f172a !important;
+  color: #e2e8f0 !important;
+}
+html.dark #all-notifications-modal #all-notifications-modal-body .header-notification-item {
+  color: #e2e8f0 !important;
+}
+html.dark #all-notifications-modal .bg-white,
+html.dark #all-notifications-modal .bg-white\/95,
+html.dark #all-notifications-modal .bg-slate-50,
+html.dark #all-notifications-modal .bg-slate-50\/50,
+html.dark #all-notifications-modal .bg-slate-50\/60 {
+  background: #0f172a !important;
+}
+html.dark #all-notifications-modal .border-slate-100,
+html.dark #all-notifications-modal .border-slate-200 {
+  border-color: rgba(51, 65, 85, 0.9) !important;
+}
+html.dark #all-notifications-modal .text-slate-900,
+html.dark #all-notifications-modal .text-slate-800,
+html.dark #all-notifications-modal .text-slate-700,
+html.dark #all-notifications-modal .text-slate-600 {
+  color: #e2e8f0 !important;
+}
+html.dark #all-notifications-modal .text-slate-500,
+html.dark #all-notifications-modal .text-slate-400 {
+  color: #94a3b8 !important;
+}
+html.dark #all-notifications-modal .header-notification-item:hover {
+  background: rgba(30, 41, 59, 0.65) !important;
+}
+html.dark #all-notifications-modal #all-notifications-tabs .notif-tab-btn {
+  color: #cbd5e1 !important;
+  background: #0b1224 !important;
+}
+html.dark #all-notifications-modal #all-notifications-tabs .notif-tab-btn:hover {
+  background: #172036 !important;
+}
+
+/* ===== Unified responsive UI tuning (mobile + desktop safe) ===== */
+/* Dashboard charts: compact sizing and one-line status legend */
+#app-main-content .dashboard-chart-card {
+  min-height: 210px !important;
+}
+#app-main-content .dashboard-status-card .status-multi-ring {
+  max-width: 250px !important;
+}
+#app-main-content .dashboard-status-card .status-legend {
+  flex-wrap: nowrap !important;
+  gap: 0.45rem !important;
+  overflow-x: auto;
+  overflow-y: hidden;
+  justify-content: flex-start !important;
+  white-space: nowrap;
+  scrollbar-width: none;
+}
+#app-main-content .dashboard-status-card .status-legend::-webkit-scrollbar {
+  display: none;
+  width: 0;
+  height: 0;
+}
+#app-main-content .dashboard-status-card .status-legend > span {
+  flex: 0 0 auto;
+}
+
+/* Sidebar icon buttons: same chip style language as header controls */
+.sidebar-rail-icon {
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.26);
+  box-shadow: 0 3px 10px rgba(2, 6, 23, 0.2);
+}
+html.dark .sidebar-rail-icon {
+  border-color: rgba(148, 163, 184, 0.28);
+  background: rgba(15, 23, 42, 0.55);
+  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3);
+}
+
+/* Add user + announcements button sizing */
+#add-user-btn {
+  padding: 0.62rem 0.95rem !important;
+  font-size: 0.95rem !important;
+}
+#add-user-btn svg {
+  width: 1.2rem !important;
+  height: 1.2rem !important;
+}
+#new-announcement-btn {
+  padding: 0.62rem 0.95rem !important;
+  font-size: 0.95rem !important;
+}
+
+/* Staff announcements + users + audit table text normalization */
+#staff-announcements-table,
+#users-table,
+#audit-users-table {
+  font-size: 0.93rem !important;
+}
+
+/* Audit action icon/button scale */
+.audit-view-btn {
+  width: 2rem !important;
+  height: 2rem !important;
+  min-width: 2rem !important;
+}
+.audit-view-btn svg {
+  width: 1rem !important;
+  height: 1rem !important;
+}
+#audit-modal #audit-modal-download,
+#audit-modal #audit-modal-print {
+  padding: 0.42rem 0.75rem !important;
+  font-size: 0.92rem !important;
+}
+#audit-modal #audit-modal-download svg,
+#audit-modal #audit-modal-print svg {
+  width: 0.95rem !important;
+  height: 0.95rem !important;
+}
+
+/* Mobile-specific fit and help button placement above bottom bar */
+@media (max-width: 767px) {
+  #it-help-request-btn-rail {
+    position: fixed !important;
+    right: 0.75rem;
+    bottom: 6.9rem !important;
+    z-index: 120 !important;
+    width: 3rem !important;
+    min-width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 9999px !important;
+    border: 1px solid rgba(148, 163, 184, 0.3) !important;
+    background: rgba(30, 41, 59, 0.92) !important;
+    box-shadow: 0 10px 24px rgba(2, 6, 23, 0.35) !important;
+  }
+  #app-main-content .dashboard-chart-card {
+    min-height: 184px !important;
+    padding: 0.78rem !important;
+  }
+  #app-main-content .dashboard-status-card .status-multi-ring {
+    max-width: 208px !important;
+  }
+  #app-main-content .dashboard-status-card .status-legend {
+    font-size: 0.73rem !important;
+    padding: 0.45rem 0.5rem !important;
+  }
+  #app-main-content .dashboard-status-card .status-legend svg,
+  #app-main-content .dashboard-status-card .status-legend .h-4.w-4 {
+    width: 0.9rem !important;
+    height: 0.9rem !important;
+  }
+  #add-user-btn,
+  #new-announcement-btn {
+    padding: 0.58rem 0.85rem !important;
+    font-size: 0.9rem !important;
+  }
+  .audit-view-btn {
+    width: 1.9rem !important;
+    height: 1.9rem !important;
+  }
+  #staff-announcements-table,
+  #users-table,
+  #audit-users-table {
+    font-size: 0.86rem !important;
+  }
+}
+
+/* Web/desktop/tablet: keep help icon inside menu bar */
+@media (min-width: 768px) {
+  #it-help-request-btn-rail {
+    position: relative !important;
+    right: auto !important;
+    bottom: auto !important;
+    z-index: auto !important;
+    width: 3rem !important;
+    min-width: 3rem !important;
+    height: 3rem !important;
+    border-radius: 1.25rem !important;
+  }
+}
+
+/* Global "Close" action buttons: match primary Save button style */
+.ticket-modal-close,
+.js-close-profile-modal:not([aria-label="Close"]),
+#submit-ticket-cancel,
+#ticket-create-success-stay,
+#hfab-notice-close {
+  background-color: #1fb6ff !important;
+  color: #ffffff !important;
+  border: 0 !important;
+  border-bottom: 0 !important;
+  border-radius: 0.95rem !important;
+  font-weight: 700 !important;
+  box-shadow: 0 10px 24px -14px rgba(31, 182, 255, 0.8) !important;
+}
+.ticket-modal-close:hover,
+.js-close-profile-modal:not([aria-label="Close"]):hover,
+#submit-ticket-cancel:hover,
+#ticket-create-success-stay:hover,
+#hfab-notice-close:hover {
+  background-color: #4ec8ff !important;
+  color: #ffffff !important;
+  transform: none !important;
+}
